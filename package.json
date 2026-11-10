@@ -1,0 +1,161 @@
+{
+  "name": "nan-bridge",
+  "displayName": "NaN Bridge for Copilot Chat",
+  "description": "Use NaN.Builders open models in GitHub Copilot Chat with your NaN API key.",
+  "version": "1.0.0",
+  "publisher": "SrScorpio",
+  "license": "MIT",
+  "icon": "assets/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SrScorpio/nan-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SrScorpio/nan-bridge/issues"
+  },
+  "homepage": "https://github.com/SrScorpio/nan-bridge#readme",
+  "engines": {
+    "vscode": "^1.125.0"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Machine Learning"
+  ],
+  "keywords": [
+    "copilot",
+    "api-key",
+    "language-model",
+    "nan",
+    "nan-builders",
+    "copilot-chat",
+    "language-model-provider",
+    "vscode-extension"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguageModelChatProvider:nan-builders"
+  ],
+  "main": "./out/activate.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "nanBridge.manage",
+        "title": "NaN Bridge: Manage"
+      },
+      {
+        "command": "nanBridge.configureEntry",
+        "title": "NaN Bridge: Configure Entry"
+      },
+      {
+        "command": "nanBridge.addAccount",
+        "title": "NaN Bridge: Add Account"
+      },
+      {
+        "command": "nanBridge.selectProfile",
+        "title": "NaN Bridge: Select Profile"
+      },
+      {
+        "command": "nanBridge.setApiKey",
+        "title": "NaN Bridge: Set API Key"
+      },
+      {
+        "command": "nanBridge.clearApiKey",
+        "title": "NaN Bridge: Clear API Key"
+      },
+      {
+        "command": "nanBridge.testConnection",
+        "title": "NaN Bridge: Test Connection"
+      },
+      {
+        "command": "nanBridge.refreshModels",
+        "title": "NaN Bridge: Refresh Models"
+      },
+      {
+        "command": "nanBridge.showUsage",
+        "title": "NaN Bridge: Show Usage"
+      },
+      {
+        "command": "nanBridge.diagnostics",
+        "title": "NaN Bridge: Show Diagnostics"
+      }
+    ],
+    "configuration": {
+      "title": "NaN Bridge",
+      "properties": {
+        "nanBridge.apiBaseUrl": {
+          "type": "string",
+          "description": "NaN.Builders API base URL.",
+          "default": "https://api.nan.builders/v1"
+        },
+        "nanBridge.requestConnectTimeoutSeconds": {
+          "type": "number",
+          "default": 20,
+          "minimum": 5,
+          "maximum": 300,
+          "description": "Seconds to wait for the gateway to accept a request before giving up."
+        },
+        "nanBridge.streamIdleTimeoutSeconds": {
+          "type": "number",
+          "default": 120,
+          "minimum": 10,
+          "maximum": 3600,
+          "description": "Seconds of silence on an open stream before the request is aborted. Long agent turns keep the stream alive with tokens, so this only fires on a stalled connection."
+        },
+        "nanBridge.showUsageStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the NaN usage status-bar item."
+        },
+        "nanBridge.reasoningEffort": {
+          "type": "string",
+          "enum": [
+            "none",
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "default": "medium",
+          "description": "Default reasoning effort for models that support reasoning. The per-model picker in chat overrides this."
+        }
+      }
+    },
+    "languageModelChatProviders": [
+      {
+        "vendor": "nan-builders",
+        "displayName": "NaN Bridge",
+        "configuration": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "type": "string",
+              "title": "NaN Bridge Profile",
+              "description": "Profile ID created with NaN Bridge: Add NaN Account (for example, personal or work).",
+              "default": "default",
+              "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('out',{recursive:true,force:true})\"",
+    "compile": "npm run clean && tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile && node --test \"out/**/*.test.js\"",
+    "check": "npm test",
+    "prepackage": "npm run check",
+    "package": "vsce package --no-dependencies --readme-path README_PACKAGE.md",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/vscode": "^1.125.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.7.0"
+  }
+}

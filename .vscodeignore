@@ -1,0 +1,14 @@
+.vscode/**
+.github/**
+node_modules/**
+src/**
+test/**
+out/**/*.test.js
+out/**/*.test.d.ts
+out/**/*.js.map
+README.md
+NOTICE.md
+tsconfig.json
+.gitignore
+assets/cover.jpg
+*.vsix
