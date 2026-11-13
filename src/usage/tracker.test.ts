@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MemoryUsageStore, UsageTracker, parseRemoteUsage } from "./tracker.js";
+import { MemoryUsageStore, UsageTracker, parseCredits, parseRemoteUsage } from "./tracker.js";
 
 const REPORT = { promptTokens: 100, completionTokens: 20, cachedTokens: 0 };
 
@@ -111,4 +111,80 @@ test("aggregates the calendar-month slice with label and token order", () => {
   });
   assert.ok(noDates); // window rows parse fine
   assert.equal(noDates.month, undefined); // nothing dated in the month yet
+});
+
+test("reads credits from rows, window totals and the billing period", () => {
+  const remote = parseRemoteUsage({
+    object: "usage.report",
+    start_date: "2026-11-01",
+    end_date: "2026-11-12",
+    data: [
+      { date: "2026-11-12", model: "glm5.3", api_requests: 2, total_tokens: 100, credits: 0.5 },
+    ],
+    // `totals` covers the whole window even when rows are paginated, so it
+    // wins over what this single page aggregates.
+    totals: {
+      api_requests: 9,
+      total_tokens: 900,
+      credits: 4.5,
+      by_model: [{ model: "glm5.3", api_requests: 9, total_tokens: 900, credits: 4.5 }],
+    },
+    credits: {
+      period_start: "2026-11-16T10:00:00Z",
+      period_end: "2026-12-16T10:00:00Z",
+      allowance: 7000,
+      used: 24.3,
+      remaining: 6975.7,
+      pack_credits: 0,
+      pack_expires_at: null,
+      frozen: false,
+    },
+  });
+  assert.ok(remote);
+  assert.equal(remote.requests, 9);
+  assert.equal(remote.totalTokens, 900);
+  assert.equal(remote.credits, 4.5);
+  assert.equal(remote.byModel[0].credits, 4.5);
+  assert.equal(remote.period?.allowance, 7000);
+  assert.equal(remote.period?.remaining, 6975.7);
+  assert.equal(remote.period?.packExpiresAt, undefined);
+  assert.equal(remote.period?.frozen, false);
+  // The month slice always comes from the rows.
+  assert.equal(remote.month?.credits, 0.5);
+  assert.equal(remote.month?.byModel[0].credits, 0.5);
+});
+
+test("accounts not billed in credits report no period", () => {
+  const remote = parseRemoteUsage({
+    object: "usage.report",
+    end_date: "2026-11-12",
+    data: [{ date: "2026-11-12", model: "gemma4", api_requests: 1, total_tokens: 10 }],
+    credits: null,
+  });
+  assert.ok(remote);
+  assert.equal(remote.period, undefined);
+  assert.equal(remote.credits, undefined); // no row credits either
+});
+
+test("malformed credit fields are dropped instead of poisoning the sums", () => {
+  const remote = parseRemoteUsage({
+    object: "usage.report",
+    end_date: "2026-11-12",
+    data: [
+      { date: "2026-11-12", model: "glm5.3", api_requests: 1, total_tokens: 10, credits: "1.2" },
+      { date: "2026-11-12", model: "glm5.3", api_requests: 1, total_tokens: 10, credits: null },
+      { date: "2026-11-12", model: "glm5.3", api_requests: 1, total_tokens: 10, credits: 0.5 },
+    ],
+    credits: { allowance: "7000", used: 1, remaining: 2, pack_credits: null, frozen: "no" },
+  });
+  assert.ok(remote);
+  assert.equal(remote.credits, 0.5);
+  assert.equal(remote.byModel[0].credits, 0.5);
+  assert.equal(remote.period, undefined); // allowance not a number
+});
+
+test("frozen flag is only true for an explicit boolean", () => {
+  const base = { period_start: "2026-11-16T10:00:00Z", period_end: "2026-12-16T10:00:00Z", allowance: 10, used: 1, remaining: 9 };
+  assert.equal(parseCredits({ ...base, frozen: true })?.frozen, true);
+  assert.equal(parseCredits({ ...base, frozen: 1 })?.frozen, false);
 });

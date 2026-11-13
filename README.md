@@ -2,7 +2,7 @@
 
 [![Built with NaN](https://nan.builders/badge/built-with-nan-compact.svg)](https://nan.builders/?ref=built-with-nan)
 [![CI](https://github.com/SrScorpio/nan-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/SrScorpio/nan-bridge/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/badge/release-v1.0.0-7D39EB)](https://github.com/SrScorpio/nan-bridge/releases/latest)
+[![Release](https://img.shields.io/badge/release-v1.1.0-7D39EB)](https://github.com/SrScorpio/nan-bridge/releases/latest)
 
 Bring [NaN.Builders](https://nan.builders/?ref=built-with-nan) open models — GLM, Qwen, DeepSeek, Gemma and more — into GitHub Copilot Chat with your own NaN API key. No subscriptions, no account linking: paste a key, pick a model, chat.
 
@@ -19,7 +19,7 @@ Bring [NaN.Builders](https://nan.builders/?ref=built-with-nan) open models — G
 - Keeps a **per-key slot queue** so parallel Copilot requests never exceed the gateway's parallel-request limit (429s stay rare instead of guaranteed).
 - Two independent clocks per request: a **connect timeout** (headers must arrive) and an **idle timeout** that re-arms on every chunk — long agent turns are never killed by a total deadline.
 - Hybrid model catalog: curated local metadata merged with the live `/models` directory, so brand-new NaN models appear without an extension update.
-- Usage tracking per model in the status bar, with the gateway's own totals.
+- Usage tracking from the gateway's own report, **in credits**: status bar shows credits used out of the plan allowance, the panel breaks spend down by model for the window and the current month, and pack credits plus an inactive-subscription warning are surfaced.
 
 ## Install
 
@@ -39,7 +39,7 @@ Bring [NaN.Builders](https://nan.builders/?ref=built-with-nan) open models — G
 | `NaN Bridge: Select Profile` | Switch the active profile (editor, bot, …) |
 | `NaN Bridge: Test Connection` | List models through the gateway with the active key |
 | `NaN Bridge: Refresh Models` | Drop the catalog cache and re-fetch |
-| `NaN Bridge: Show Usage` | Per-model request/token counters |
+| `NaN Bridge: Show Usage` | Credits used/remaining, per-model spend and tokens |
 | `NaN Bridge: Show Diagnostics` | Dump state into the output channel |
 
 ## Settings
@@ -49,13 +49,14 @@ Bring [NaN.Builders](https://nan.builders/?ref=built-with-nan) open models — G
 | `nanBridge.apiBaseUrl` | `https://api.nan.builders/v1` | Gateway endpoint |
 | `nanBridge.requestConnectTimeoutSeconds` | `20` | Wait for response headers |
 | `nanBridge.streamIdleTimeoutSeconds` | `120` | Silence limit on an open stream |
-| `nanBridge.showUsageStatus` | `true` | Status-bar usage item |
+| `nanBridge.showUsageStatusBar` | `true` | Status-bar usage item |
+| `nanBridge.reasoningEffort` | `medium` | Default effort for reasoning models (the picker overrides it) |
 
 ## Development
 
 ```bash
 npm install
-npm run check     # compile + 57 tests
+npm run check     # compile + 99 tests
 npm run package   # produce the .vsix (packaged README has no images)
 ```
 

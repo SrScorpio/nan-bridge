@@ -2,7 +2,7 @@
   "name": "nan-bridge",
   "displayName": "NaN Bridge for Copilot Chat",
   "description": "Use NaN.Builders open models in GitHub Copilot Chat with your NaN API key.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "SrScorpio",
   "license": "MIT",
   "icon": "assets/icon.png",

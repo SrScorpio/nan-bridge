@@ -4,6 +4,37 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-11-13
+
+Credit-based billing. NaN now charges a **credit pool per billing period**
+instead of monthly token allowances, and its `/usage` report exposes the
+numbers, so the panel shows what the gateway actually bills.
+
+### Added
+
+- **Credits in the usage panel**: status bar leads with `used/allowance`
+  credits, and the tooltip/quick pick show the billing period, credits
+  spent and remaining, and pack credits with their expiry date.
+- **Per-model credit spend** for the window and the current calendar
+  month, alongside tokens.
+- **Inactive-subscription warning** when the gateway reports
+  `credits.frozen` — credit-billed requests are refused until it clears.
+- Window figures now come from the report's `totals` object (guaranteed to
+  cover the whole window even when rows are paginated), with row sums as a
+  fallback.
+
+### Changed
+
+- Documented **token allowances removed** from the catalog: quotas were a
+  token-era concept and are superseded by real credit balances.
+- README/settings docs corrected (`nanBridge.showUsageStatusBar`, missing
+  `nanBridge.reasoningEffort`, test count).
+
+### Fixed
+
+- Credit sums are rounded to one decimal, so float noise from the wire
+  never leaks into the panel.
+
 ## [1.0.0] — 2026-11-10
 
 Initial public release.

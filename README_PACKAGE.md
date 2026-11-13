@@ -16,7 +16,7 @@ Use NaN.Builders open models in GitHub Copilot Chat with your own NaN API key.
 - **Select Profile** — switch active profile
 - **Test Connection** — verify the key by listing models
 - **Refresh Models** — re-fetch the model catalog
-- **Show Usage** — per-model request and token counters
+- **Show Usage** — credits used and remaining for the billing period, plus per-model spend and tokens
 - **Show Diagnostics** — state dump in the output channel
 
 ## Settings
@@ -24,7 +24,8 @@ Use NaN.Builders open models in GitHub Copilot Chat with your own NaN API key.
 - `nanBridge.apiBaseUrl` (default `https://api.nan.builders/v1`) — gateway endpoint
 - `nanBridge.requestConnectTimeoutSeconds` (default 20) — wait for response headers
 - `nanBridge.streamIdleTimeoutSeconds` (default 120) — silence limit on an open stream; long turns are never cut by a total deadline
-- `nanBridge.showUsageStatus` (default true) — status-bar usage item
+- `nanBridge.showUsageStatusBar` (default true) — status-bar usage item
+- `nanBridge.reasoningEffort` (default `medium`) — default effort for reasoning models; the in-chat picker overrides it
 
 ## Notes
 

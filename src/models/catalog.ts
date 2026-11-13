@@ -16,9 +16,6 @@ export interface ModelDescriptor {
   /** Picker order: lower first. */
   readonly priority: number;
   readonly note: string;
-  /** Documented monthly allowance per member (nan.builders docs). Absent
-   *  for models the docs list without a quota. */
-  readonly monthlyQuotaTokens?: number;
 }
 
 const ONE_M = 1_048_576;
@@ -29,31 +26,26 @@ export const STATIC_MODELS: readonly ModelDescriptor[] = [
     id: "glm5.3", label: "GLM 5.3", family: "glm",
     contextTokens: ONE_M, outputTokens: 262_144, vision: true, priority: 10,
     note: "MoE ~753B premium flagship; vision, audio and video input.",
-    monthlyQuotaTokens: 3_000_000_000,
   },
   {
     id: "deepseek-v4-flash", label: "DeepSeek V4 Flash", family: "deepseek",
     contextTokens: ONE_M, outputTokens: 262_144, vision: true, priority: 20,
     note: "MoE 305B fast general model; vision input.",
-    monthlyQuotaTokens: 3_000_000_000,
   },
   {
     id: "glm5.3-flash", label: "GLM 5.3 Flash", family: "glm",
     contextTokens: ONE_M, outputTokens: 262_144, vision: true, priority: 30,
     note: "MoE 320B fast GLM; vision input.",
-    monthlyQuotaTokens: 2_000_000_000,
   },
   {
     id: "qwen3.8-flash", label: "Qwen 3.8 Flash", family: "qwen",
     contextTokens: ONE_M, outputTokens: 262_144, vision: true, priority: 40,
     note: "MoE 125B fast Qwen; vision input.",
-    monthlyQuotaTokens: 500_000_000,
   },
   {
     id: "mimo-v2.6-flash", label: "MiMo v2.6 Flash", family: "mimo",
     contextTokens: ONE_M, outputTokens: 262_144, vision: true, priority: 50,
     note: "Omnimodal model with audio input; vision input.",
-    monthlyQuotaTokens: 1_000_000_000,
   },
   {
     id: "gemma4", label: "Gemma 4", family: "gemma",
@@ -78,11 +70,6 @@ export interface CatalogEntry extends ModelDescriptor {
 
 export function inputBudgetFor(contextTokens: number, outputTokens: number): number {
   return Math.max(1, Math.min(contextTokens - outputTokens, Math.floor(contextTokens * 0.9)));
-}
-
-/** Documented monthly allowance for a model, or undefined when none is published. */
-export function monthlyQuotaFor(modelId: string): number | undefined {
-  return STATIC_MODELS.find((model) => model.id === modelId)?.monthlyQuotaTokens;
 }
 
 /**
