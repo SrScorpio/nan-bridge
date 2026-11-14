@@ -180,12 +180,15 @@ export function parseRemoteUsage(payload: unknown): RemoteUsage | undefined {
       creditsSeen = true;
     }
     if (totals.byModel?.length) {
-      windowByModel = totals.byModel.map((row) => ({
-        model: row.model,
-        requests: row.requests,
-        totalTokens: row.totalTokens,
-        credits: row.credits ?? 0,
-      }));
+      windowByModel = totals.byModel
+        .map((row) => ({
+          model: row.model,
+          requests: row.requests,
+          totalTokens: row.totalTokens,
+          // Keep `credits` optional: an absent field must not render as "0 cr".
+          credits: row.credits,
+        }))
+        .sort((a, b) => b.requests - a.requests);
       if (totals.credits === undefined && totals.byModel.some((row) => row.credits !== undefined)) {
         credits = totals.byModel.reduce((sum, row) => sumCredits(sum, row.credits), 0);
         creditsSeen = true;
@@ -207,6 +210,9 @@ export function parseRemoteUsage(payload: unknown): RemoteUsage | undefined {
           label: monthLabel(endDate),
           requests: monthRequests,
           totalTokens: monthTokens,
+          // Sum of daily-rounded rows, so it can differ from `period.used`
+          // (the gateway's precise total) by a few tenths. The API exposes no
+          // authoritative per-month figure, so this is the best available.
           credits: monthCreditsSeen ? monthCredits : undefined,
           byModel: [...monthByModel.values()].sort((a, b) => b.totalTokens - a.totalTokens),
         }
